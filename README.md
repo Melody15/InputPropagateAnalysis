@@ -68,7 +68,7 @@ Use opt to perform the static analysis on Linux driver bitcode file.
 
 Check the dummy output file.
 
-Each hardware input start from a function which use an input assembly instruction (`in/mov` in X86, `ldr` in ARM64) to obtain a hardware input from an external device (via driver), then generate a variable use-chain where the input value propagate on, and finally end at a `br\ret` instruction.
+Each hardware input start from a function which use an input assembly instruction (`in/mov` in X86, `ldr` in ARM64) to obtain a hardware input from an external device (via driver), then generate a variable use-chain where the input value propagate on, and finally end at a `br/ret` instruction.
 
 # Result
 There are still some unhandled situation during static analysis, but it seems that the hardware input does not affect the branch/jmp operation during driver code too much.. so yes, this may just a failed exploration, but at least it make me know a little about llvm.
