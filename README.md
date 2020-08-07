@@ -17,8 +17,8 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
         llvm_9.0.0
         ├── build                               (3)
         ├── llvm-9.0.0.src/lib/Transforms
-        │   ├── Arm64ValuePropagate
-        │   │   ├── Arm64ValuePropagate.cpp
+        │   ├── ValuePropagate
+        │   │   ├── ValuePropagate.cpp
         │   │   └── CMakeLists.txt              (1)
         │   ├── Arm64ValuePropagate
         │   │   ├── Arm64ValuePropagate.cpp
@@ -31,7 +31,7 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
         add_subdirectory(ValuePropagate)
         add_subdirectory(Arm64ValuePropagate)
 
-4. Back to your llvm compile directory (For me which is `llvm_9.0.0/build` (3), it should be should be in the same catalogue as `llvm-9.0.0.src`)
+4. Back to your llvm compile directory (For me which is `llvm_9.0.0/build` (3)), it should be in the same catalogue as `llvm-9.0.0.src`)
 
 5. Compile the pass with llvm.
 
@@ -39,7 +39,7 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
 
 
 # How it works
-The `ValuePropagate Pass` take the Linux driver llvm bitcode as input, and use `opt` to perform static analysis, then give a simple tree structure output.
+The `ValuePropagate` Pass takes the Linux driver llvm bitcode as input, it could used by `opt` to perform static analysis, and finally gives a simple tree structure output.
 
 - `ValuePropagate` for x86 arch Linux Kernel.
 
@@ -53,10 +53,10 @@ One can obtain the input bitcode file from the following methods:
     - `example/rtc.ll` is the rtc driver bitcode file in x86 Linux Kernel.
     - One may find nothing with only a single driver file cause the hardware input not happened here.
 - To perform analysis on each driver module:
-    - Maybe one can use [difuze](https://github.com/ucsb-seclab/difuze) to obtain a series of driver modules. (difuze use `llvm-link` to link a whole driver module into a single bitcode file.)
+    - One may use [difuze](https://github.com/ucsb-seclab/difuze) to obtain a series of driver modules. (difuze use `llvm-link` to link each driver module into a single bitcode file.)
 - To perform analysis on the whole Linux kernel：
-    - Compile the Linux kernel into a single bitcode file, one can use [wllvm](https://github.com/SRI-CSL/whole-program-llvm) to compile one.
-    - The analysis process may be very slow.
+    - Compile the Linux kernel into a single bitcode file, one may use [wllvm](https://github.com/SRI-CSL/whole-program-llvm) to compile it.
+    - The analysis process on the whole kernel may be very slow.
 
 ## Run
 
@@ -68,7 +68,8 @@ Use opt to perform the static analysis on Linux driver bitcode file.
 
 Check the dummy output file.
 
-Each hardware input start from a function which use an input assembly instruction (`in/mov` in X86, `ldr` in ARM64) to obtain a hardware input from an external device (via driver), then generate a variable use-chain where the input value propagate on, and finally end at a `br/ret` instruction.
+Each hardware input start from a function which use an input assembly instruction (`in/mov` in X86, `ldr` in ARM64) to obtain a hardware input from an external device (via driver code), then follow with a variable use-chain where the input value propagate on, and finally end at a `br/ret` instruction.
 
 # Result
-There are still some unhandled situation during static analysis, but it seems that the hardware input does not affect the branch/jmp operation during driver code too much.. so yes, this may just a failed exploration, but at least it make me know a little about llvm.
+There are still some unhandled situation during static analysis, but it seems that the hardware input does not affect the branch/jmp operation during driver code too much.. so yes, this may just a failed exploration.
+<!-- , but at least it make me know a little about llvm :). -->
