@@ -8,10 +8,24 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
 # Requirements
 
 - [LLVM](http://llvm.org/docs/GettingStarted.html#overview) (The pass was implemented based on llvm-9.0.0)
+- CMake
 - Linux driver bitcode
 
 # Build
-1. Download and build llvm-9.0.0. ([See from here](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)).
+1. [Download](https://releases.llvm.org/download.html#9.0.0) and build llvm-9.0.0, and one may build clang as well.
+        
+        // After downloading and extracting llvm-9.0.0 & clang-9.0.0 (cfe-9.0.0)
+        // Build with clang
+        mv cfe-9.0.0.src llvm-9.0.0.src/tools/clang
+        mkdir build
+        cd build
+        cmake ../llvm-9.0.0.src -DLLVM_TARGETS_TO_BUILD=X86 -DCMAKE_BUILD_TYPE=Release
+        make -j4
+    
+    When finished, one can find the executable llvm & clang under `build/bin`.
+    
+    See more details from the [official documentation](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm).
+
 2. Copy the `ValuePropagate` into llvm source code directory (`llvm-9.0.0.src/lib/Transforms`), as the following structure:
 
         llvm_9.0.0
