@@ -8,8 +8,9 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
 # Requirements
 
 - [LLVM](http://llvm.org/docs/GettingStarted.html#overview) (The pass was implemented based on llvm-9.0.0)
+- Clang (Same version as LLVM)
 - CMake
-- Linux driver bitcode
+- Linux Kernel
 
 # Build
 1. [Download](https://releases.llvm.org/download.html#9.0.0) and build llvm-9.0.0, and one may build clang as well.
@@ -22,7 +23,7 @@ The insight is that if a hardware input can affect the branch/jmp operation duri
         cmake ../llvm-9.0.0.src -DLLVM_TARGETS_TO_BUILD=X86 -DCMAKE_BUILD_TYPE=Release
         make -j4
     
-    When finished, one can find the executable llvm & clang under `build/bin`.
+    When finished, one can find the executable llvm & clang under `build/bin`. (One may use `make install` to install it.)
     
     See more details from the [official documentation](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm).
 
@@ -63,8 +64,11 @@ The `ValuePropagate` Pass takes the Linux driver llvm bitcode as input, it could
 One can obtain the input bitcode file from the following methods:
 
 - To perform analysis on single hardware driver source file:
-    - Complie the driver source file using `clang-9` with `-emit-llvm` flag to get the bitcode file.
-    - `example/rtc.ll` is the rtc driver bitcode file in x86 Linux Kernel.
+    - Complie the driver source file using `clang` with `-emit-llvm` flag to get the bitcode file.
+    - `example/rtc.c` is the rtc driver source file in x86 Linux Kernel `(arch/x86/kernel/rtc.c)`, one can use clang to get its bitcode file.
+        ```
+        clang -S --emit-llvm example/rtc.c -o example/rtc.ll
+        ```
     - One may find nothing with only a single driver file cause the hardware input not happened here.
 - To perform analysis on each driver module:
     - One may use [difuze](https://github.com/ucsb-seclab/difuze) to obtain a series of driver modules. (difuze use `llvm-link` to link each driver module into a single bitcode file.)
@@ -76,7 +80,7 @@ One can obtain the input bitcode file from the following methods:
 
 Use opt to perform the static analysis on Linux driver bitcode file.
 
-        opt -load ./llvm_9.0.0/build/lib/LLVMValuePropagate.so -ValuePropagate -analyze rtc.ll | tee output.log
+        opt -load ./llvm_9.0.0/build/lib/LLVMValuePropagate.so -ValuePropagate -analyze example/rtc.ll | tee output.log
 
 ## Output
 
